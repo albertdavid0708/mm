@@ -28,3 +28,7 @@ function createRedisClient(label = "default") {
     .on("end", () => console.log(`Redis[${label}]: End`));
   return newClient;
 }
+
+const redis = createRedisClient();
+
+export { createRedisClient, redis };

@@ -17,9 +17,10 @@ const envVarsSchema = Joi.object()
     MYSQL_USER: Joi.string().default("root").required(),
     MYSQL_PASSWORD: Joi.string().required(),
     DATABASE_SCHEMA: Joi.string(),
-    // REDIS_HOST: Joi.string().required().description('Redis connection Host'),
-    // REDIS_PORT: Joi.number().default(6379),
-    // REDIS_PASSWORD: Joi.string().default("")
+    REDIS_HOST: Joi.string().required().description("Redis connection Host"),
+    REDIS_PORT: Joi.number().default(6379),
+    REDIS_PASSWORD: Joi.string().default(""),
+    PRIMARY_PRIVATE_KEY: Joi.string().required(),
   })
   .unknown();
 
@@ -46,5 +47,8 @@ export const env = {
     port: envVars.REDIS_PORT,
     password: envVars.REDIS_PASSWORD,
     db: 0,
+  },
+  wallet: {
+    primaryKey: envVars.PRIMARY_PRIVATE_KEY,
   },
 };

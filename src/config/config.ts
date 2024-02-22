@@ -21,6 +21,7 @@ const envVarsSchema = Joi.object()
     REDIS_PORT: Joi.number().default(6379),
     REDIS_PASSWORD: Joi.string().default(""),
     PRIMARY_PRIVATE_KEY: Joi.string().required(),
+    PRIVATE_KEY: Joi.string().required()
   })
   .unknown();
 
@@ -51,4 +52,7 @@ export const env = {
   wallet: {
     primaryKey: envVars.PRIMARY_PRIVATE_KEY,
   },
+  key: {
+    privateKey: envVars.PRIVATE_KEY
+  }
 };

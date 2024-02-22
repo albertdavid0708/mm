@@ -70,4 +70,8 @@ enum Period {
   OneDay = "1d",
   OneWeek = "1w",
 }
-export { KeyRedisPrefix, DataKey, Period };
+
+enum Chain {
+  bsc = "bsc",
+}
+export { KeyRedisPrefix, DataKey, Period, Chain };

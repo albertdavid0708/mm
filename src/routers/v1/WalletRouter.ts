@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { IUserService } from "../../services/IUserService";
 import { IWalletService } from "../../services/IWalletService";
-import { WalletCreatePayload } from "../../schema/wallet.schema";
-import { body, validationResult } from "express-validator";
+import { WalletCreatePayload, WalletParams } from "../../schema/wallet.schema";
+import { body, param, validationResult } from "express-validator";
 import { Chain } from "../../helper/enum";
 
 export class WalletRouter {
@@ -33,6 +33,25 @@ export class WalletRouter {
           }
           const body: WalletCreatePayload = req.body;
           res.status(200).json(await this.walletService.createMultiple(body));
+        } catch (error) {
+          next(error);
+        }
+      }
+    );
+
+    this._router.get(
+      "",
+      // [
+      //   param
+      // ],
+      async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const errors = validationResult(req);
+          if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+          }
+          const params: WalletParams = req.params as unknown as WalletParams;
+          res.status(200).json(await this.walletService.getWallet(params));
         } catch (error) {
           next(error);
         }

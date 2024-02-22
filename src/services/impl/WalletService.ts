@@ -1,4 +1,8 @@
-import { WalletCreatePayload, WalletParams } from "../../schema/wallet.schema";
+import {
+  WalletCreatePayload,
+  WalletParams,
+  WalletResponse,
+} from "../../schema/wallet.schema";
 import { IWalletService } from "../IWalletService";
 import { IWalletRepo } from "../../repositories/IWalletRepo";
 import { IOnChainService } from "../IOnChainService";
@@ -20,7 +24,16 @@ class WalletService implements IWalletService {
     return;
   }
 
-  public async getWallet(params: WalletParams) {}
+  public async getWallet(params: WalletParams): Promise<WalletResponse[]> {
+    const wallets = await this.walletRepo.getWallets(params);
+    const res: WalletResponse[] = [];
+    for (const wallet of wallets) {
+      res.push({
+        address: wallet.address,
+      });
+    }
+    return res;
+  }
 }
 
 export { WalletService };

@@ -16,4 +16,8 @@ type WalletOnChain = {
   mnemonic?: string;
 };
 
-export { WalletParams, WalletCreatePayload, WalletOnChain };
+type WalletResponse = {
+  address: string;
+};
+
+export { WalletParams, WalletCreatePayload, WalletOnChain, WalletResponse };

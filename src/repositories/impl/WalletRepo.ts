@@ -1,6 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { Wallet } from "../../entities/Wallet";
-import { WalletOnChain } from "../../schema/wallet.schema";
+import { WalletOnChain, WalletParams } from "../../schema/wallet.schema";
 import { IWalletRepo } from "../IWalletRepo";
 
 export class WalletRepo implements IWalletRepo {
@@ -17,7 +17,12 @@ export class WalletRepo implements IWalletRepo {
       newWallet.privateKey = wallet.privateKey;
       walletDatabases.push(newWallet);
     }
-    console.log(walletDatabases)
+    console.log(walletDatabases);
     await this.walletRepository.insert(walletDatabases);
+  }
+
+  public async getWallets(params: WalletParams): Promise<Wallet[]> {
+    const wallets = this.walletRepository.find();
+    return wallets;
   }
 }

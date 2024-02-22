@@ -68,7 +68,7 @@ async function getAllEvent() {
   const toBlock = await provider.getBlockNumber();
   console.log(toBlock);
   const fromBlock = toBlock - 30000;
-  const step = 5000;
+  const step = 10000;
   let events: ethers.EventLog[] = [];
   for (let i = toBlock; i >= fromBlock; i -= step) {
     try {

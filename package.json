@@ -12,7 +12,8 @@
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
     "mm": "npx ts-node src/job/index.ts",
     "event:all": "npx ts-node src/job/getAllEvent.ts",
-    "event:listen": "npx ts-node src/job/ListenEvent.ts"
+    "event:listen": "npx ts-node src/job/ListenEvent.ts",
+    "candle": "npx ts-node src/job/initCandle.ts"
   },
   "keywords": [],
   "author": "",

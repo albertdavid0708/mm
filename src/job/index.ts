@@ -202,14 +202,14 @@ async function commandMM(command: Command, numParts: number) {
     }
   }
 }
-commandMM({
-  percent: 5,
-  seconds: 60,
-  position: "bull",
-}, 2).then();
-
 // commandMM({
 //   percent: 5,
 //   seconds: 60,
-//   position: "bear",
-// }).then();
+//   position: "bull",
+// }, 5).then();
+
+commandMM({
+  percent: 5,
+  seconds: 60,
+  position: "bear",
+}, 3).then();

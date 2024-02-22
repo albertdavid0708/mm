@@ -33,22 +33,31 @@ async function initFromToCandleMinutes(from: number, to: number) {
   const period = Period.OneMinute;
   for (const token of allTokens) {
     const keyOHLC = genKeyTokenPriceOHLC(token.network, token.address, period);
+    let previousCandle: any = {};
     for (let i = from; i <= to; i += 60) {
       const timestamp = getBeginningOfCurrentMinute(i);
 
       const candle = await getCandlesForToken(token, timestamp, period);
-      const timestampPrevious = getBeginningOfCurrentMinute(timestamp - 1);
+      const timestampPrevious = timestamp - 60;
+      const timestampAfter = timestamp + 60;
       const candlePrevious = await getCandlesForToken(
         token,
         timestampPrevious,
         period
       );
-      console.log(candle, candlePrevious)
-      continue
+      const candleAfter = await getCandlesForToken(
+        token,
+        timestampAfter,
+        period
+      );
       if (candle.length === 0) {
+        continue;
+        let candleInsert: any = {};
+        let isNewCandle = false;
         if (candlePrevious.length !== 0) {
+          isNewCandle = true;
           const priceFormatFloat = JSON.parse(candlePrevious[0]).c;
-          const candleInsert = {
+          candleInsert = {
             t: timestamp,
             o: priceFormatFloat,
             h: priceFormatFloat,
@@ -56,31 +65,65 @@ async function initFromToCandleMinutes(from: number, to: number) {
             l: priceFormatFloat,
             vb: 0,
           };
-          console.log("timestamp", timestamp, candleInsert);
-          const pipeline = redis.pipeline();
-          pipeline.zremrangebyscore(keyOHLC, timestamp, timestamp);
-          pipeline.zadd(keyOHLC, timestamp, JSON.stringify(candleInsert));
-          await pipeline.exec();
-        } else {
-          // console.log("Dont have any candle previous", timestampPrevious);
         }
-      } else {
-        if (candlePrevious.length !== 0) {
-          const priceFormatFloat = JSON.parse(candlePrevious[0]).c;
-          const candleInsert = JSON.parse(candle[0]);
-          candleInsert.o = priceFormatFloat;
+        if (candleAfter.length !== 0) {
+          const priceFormatFloat = JSON.parse(candleAfter[0]).c;
+          isNewCandle = true;
+          if (candleInsert.t === undefined) {
+            candleInsert = {
+              t: timestamp,
+              o: priceFormatFloat,
+              h: priceFormatFloat,
+              c: priceFormatFloat,
+              l: priceFormatFloat,
+              vb: 0,
+            };
+          } else {
+            candleInsert.h = Math.max(
+              parseInt(candleInsert.h),
+              priceFormatFloat
+            ).toString();
+            candleInsert.l = Math.min(
+              parseInt(candleInsert.l),
+              priceFormatFloat
+            ).toString();
+            candleInsert.c = priceFormatFloat;
+          }
+        }
+        if (isNewCandle) {
           console.log(
-            "timestamp candle previous",
+            "timestamp",
             timestamp,
             candleInsert,
-            priceFormatFloat
+            candleAfter,
+            candlePrevious
           );
+
           const pipeline = redis.pipeline();
           pipeline.zremrangebyscore(keyOHLC, timestamp, timestamp);
           pipeline.zadd(keyOHLC, timestamp, JSON.stringify(candleInsert));
           await pipeline.exec();
+        }
+      } else {
+        if (Object.keys(previousCandle).length === 0) {
+          previousCandle = JSON.parse(candle[0]);
         } else {
-          console.log("Dont have any candle previous", timestampPrevious);
+          const candleInsert = JSON.parse(candle[0]);
+          const closePricePreviousCandle = previousCandle.c;
+          candleInsert.o = closePricePreviousCandle;
+          candleInsert.h = Math.max(
+            parseInt(candleInsert.h),
+            closePricePreviousCandle
+          ).toString();
+          candleInsert.l = Math.min(
+            parseInt(candleInsert.l),
+            closePricePreviousCandle
+          ).toString();
+          console.log("Update timestamp", candleInsert);
+          const pipeline = redis.pipeline();
+          pipeline.zremrangebyscore(keyOHLC, timestamp, timestamp);
+          pipeline.zadd(keyOHLC, timestamp, JSON.stringify(candleInsert));
+          await pipeline.exec();
         }
       }
     }
